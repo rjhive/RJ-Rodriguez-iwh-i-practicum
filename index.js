@@ -6,23 +6,79 @@ app.set('view engine', 'pug');
 app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+const hubspotApiKey = 'MyAPIKeyWentHere';
 
 // * Please DO NOT INCLUDE the private app access token in your repo. Don't do this practicum in your normal account.
-const PRIVATE_APP_ACCESS = '';
+
 
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
 // * Code for Route 1 goes here
-
+app.get('/', async (req, res) => {
+    const petsConfig = {
+        method : 'get',
+        url : 'https://api.hubapi.com/crm/v3/objects/pets?properties=name,pet_name,age',
+        headers : {
+            Authorization: `Bearer ${hubspotApiKey}`,
+            'Content-Type': 'application/json'
+        }
+    }
+    try {
+        const resp = await axios(petsConfig);
+        const data = resp.data.results;    
+        res.render('home', { title: 'Custom Object Table',data });
+    } catch (error) {
+        console.error(error);
+    }
+})
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
 // * Code for Route 2 goes here
-
+app.get('/update-cobj', (req, res) => {
+    res.render('updates', { title: 'Custom Object Table'});
+})
 // TODO: ROUTE 3 - Create a new app.post route for the custom objects form to create or update your custom object data. Once executed, redirect the user to the homepage.
 
 // * Code for Route 3 goes here
 
+app.post('/update-cobj', async (req, res) => {
+    const formData = req.body;
+    const objectId = formData.objectId; 
+  
+    try {
+      const endpoint = objectId
+        ? `https://api.hubapi.com/crm/v3/objects/pets/${objectId}`
+        : `https://api.hubapi.com/crm/v3/objects/pets`;
+        
+      const method = objectId ? 'patch' : 'post';
+  
+      const response = await axios({
+        method: method,
+        url: endpoint,
+        headers: {
+          Authorization: `Bearer ${hubspotApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        data: {
+          properties: {
+            pet_name: formData.pet_name,  // Update these to match your custom object’s fields
+            age: formData.age,
+            name: formData.name
+          }
+        }
+      });
+  
+      res.redirect('/');
+    } catch (error) {
+      console.error('Error creating/updating custom object:', error.response?.data || error.message);
+      const message = error.response?.data?.message || 'Failed to create/update custom object';
+      res.status(500).send(message);
+    }
+  });
+  
+
 /** 
+
 * * This is sample code to give you a reference for how you should structure your calls. 
 
 * * App.get sample
