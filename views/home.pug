@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title= title
+  body
+    h1= title
+    a(href="/update-cobj") Add/Update this table
+    table
+      tr
+        th Pet Name
+        th Age
+        th Name
+      each record in data
+        tr
+          td= record.properties.pet_name || 'N/A'
+          td= record.properties.age || 'N/A'
+          td= record.properties.name || 'N/A'

@@ -1,0 +1,23 @@
+doctype html
+html 
+    head 
+        title= `${title}`
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        
+    body    
+        h1 #{title}
+        
+        a(href="http://localhost:3000") Return to the homepage
+        br
+
+        form(action="/update-cobj", method="post")
+            label(for="pet_name") Pet Name:
+            input(type="text", id="car_name", name="pet_name", required)
+
+            label(for="age") Age:
+            input(type="text", id="age", name="age", required)
+
+            label(for="name") Name:
+            input(type="text", id="name", name="name", required)
+
+            button(type="submit") Update Pet
